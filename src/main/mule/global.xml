@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="d5fc3670-a133-4027-b137-516948e5e468" >
+		<http:listener-connection host="${http.host}" port="${http.port}" />
+	</http:listener-config>
+	<http:request-config name="HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="066e096e-5372-493f-9d1f-4fe0e240724c" >
+		<http:request-connection protocol="HTTPS" host="${request.host}" port="${request.port}" />
+	</http:request-config>
+	<db:config name="Database_Config" doc:name="Database Config" doc:id="cf5e7cc3-6731-4950-81db-7ff34df4da28" >
+		<db:my-sql-connection host="${db.host}" port="${db.port}" user="${db.user}" database="${db.dbname}" />
+	</db:config>
+	<configuration-properties doc:name="Configuration properties" doc:id="6568eecf-5d6b-4dcd-ad94-ead34368e802" file="dev.properties" />
+</mule>

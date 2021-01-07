@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:file="http://www.mulesoft.org/schema/mule/file" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd">
+	<flow name="task2Flow" doc:id="88f961b2-7c61-446d-a28f-20e5118768c1" >
+		<http:listener doc:name="Listener" doc:id="2f61123d-6bed-4ec9-9306-3eb93683005c" path="/new" config-ref="HTTP_Listener_config"/>
+		<try doc:name="Try" doc:id="94e4f414-f065-44c7-9e60-41a53396a1d9" >
+			<logger level="INFO" doc:name="Logger" doc:id="a74c44eb-5463-4854-b33f-10d12d10acb9" message="#[error.description]"/>
+			<error-handler >
+				<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="20b50a2a-5b5f-412d-bd98-5ef461d9c923" type="ANY">
+					<logger level="INFO" doc:name="Logger" doc:id="4923ee65-c1c0-4af3-bc49-eeb01aaed161" message="#[error.description]"/>
+				</on-error-continue>
+			</error-handler>
+		</try>
+		<set-variable value="#[attributes.queryParams.ftype]" doc:name="QueryParamBackup1" doc:id="e6836fcf-5dc3-4178-a466-1c81356ab619" variableName="QueryParamBackup1"/>
+		<set-variable value="#[attributes.queryParams.stype]" doc:name="QueryParamBackup2" doc:id="184b0aa8-e7af-4c2a-b17c-cd35e2368c4b" variableName="QueryParamBackup2" />
+		<db:select doc:name="Select" doc:id="166ccda0-fd14-4eb5-a773-a0ff280698c2" config-ref="Database_Config">
+			<db:sql ><![CDATA[select * from social.comments;]]></db:sql>
+		</db:select>
+		<set-variable value="#[payload]" doc:name="Set Variable" doc:id="f5071c99-7420-4f9f-9756-3f63e3ee3174" variableName="backupVar"/>
+		<choice doc:name="Choice" doc:id="e2484277-1bc6-4567-b86e-36d581cbb78d" >
+			<when expression='#[vars.QueryParamBackup1 == "xml" and vars.QueryParamBackup2 == null]'>
+				<flow-ref doc:name="Flow Reference" doc:id="62db6c71-12b2-4403-a660-bcbfb600b8db" name="JsonToXml" />
+			</when>
+			<when expression='#[vars.QueryParamBackup2 == "csv" and vars.QueryParamBackup1 == null]'>
+				<flow-ref doc:name="JsonToCsv" doc:id="6eb095b0-db42-478e-9c68-bbaeb247c970" name="JsonToCsv" />
+			</when>
+			<when expression='#[vars.QueryParamBackup1 == null and vars.QueryParamBackup2 == null]'>
+				<async doc:name="Async" doc:id="b1156cb6-b7e3-4b71-b9d9-b7331721eb27" >
+					<flow-ref doc:name="JsonToXML" doc:id="8c8c31ed-be32-45ae-9131-daf64da6c0a1" name="JsonToXml" />
+				</async>
+				<flow-ref doc:name="JsonToCsv" doc:id="200a855c-bfc3-4098-a419-3ed2375121e9" name="JsonToCsv" />
+			</when>
+			<otherwise>
+				<ee:transform doc:name="Transform Message" doc:id="6275b7ef-309d-47d0-9360-3eb4fe0a0bb2" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+{
+	"Message":"Operation Failed"
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</otherwise>
+		</choice>
+		<error-handler >
+			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="1a43d993-36b4-43fc-8334-06f2fef21e8a" type="ANY">
+				<logger level="INFO" doc:name="Logger" doc:id="0db004d9-e974-4053-98f6-5b0f68b029fb" message="#[error.description]"/>
+			</on-error-continue>
+		</error-handler>
+	</flow>
+</mule>
