@@ -5,21 +5,19 @@
 	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
 http://www.mulesoft.org/schema/mule/validation http://www.mulesoft.org/schema/mule/validation/current/mule-validation.xsd">
-	<flow name="validatorssFlow" doc:id="645597a0-9f44-49d1-92c5-a135184e062d" >
+	<validation:config name="Validation_Config" doc:name="Validation Config" doc:id="d2642f76-3274-434a-966b-9d6b5d077231" />
+	<flow name="validatorsFlow" doc:id="645597a0-9f44-49d1-92c5-a135184e062d" >
 		<http:listener doc:name="Listener" doc:id="d2deb6bf-afcc-4297-8f30-c28ae6963ccb" config-ref="HTTP_Listener_config" path="/e"/>
-		<logger level="INFO" doc:name="Logger" doc:id="2e3ac775-fb81-4267-81b1-b8ae071de349" message="1"/>
 		<try doc:name="Try" doc:id="b4acd905-1109-4b0d-8229-bea4edba206d" >
-			<validation:is-not-null doc:name="Is not null" doc:id="0f96eb64-28ed-4d18-9e1a-bb7cc93222af" value="#[attributes.queryParams.typee]" />
-			<error-handler >
-				<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="7cbc21a0-d168-4df1-99b0-7fbe2fda7884" >
-					<logger level="INFO" doc:name="Logger" doc:id="23bb2792-483d-427a-b15d-3c4864a42d27" message="try" />
-				</on-error-continue>
+			<validation:is-not-null doc:name="Is not null" doc:id="0f96eb64-28ed-4d18-9e1a-bb7cc93222af" value="#[attributes.queryParams.typee]" message="query Param isnt here " config-ref="Validation_Config"/>
+			<error-handler>
+				<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="d9020bf6-bb14-44da-b24f-9606c786a5de" >
+					<logger level="INFO" doc:name="Logger" doc:id="53155627-3116-4174-8e7d-e75c0b8a724f" />
+				</on-error-propagate>
 			</error-handler>
 		</try>
-		<validation:is-null doc:name="Is null" doc:id="25fe31a0-1bf6-4295-8548-d61d87c1d841" value="#[attributes.queryParams.typee]"/>
-		<logger level="INFO" doc:name="Logger" doc:id="42c098ff-113e-4cc9-977b-e86015b2e3b0" message="2"/>
+		<validation:is-true doc:name="Is true" doc:id="1971895e-d3ad-4942-a6c3-6576e574ce42" expression='#[ lower(attributes.queryParams.typee)  ==  lower("csv") ]' config-ref="Validation_Config" message="no match between file type , type csv not found"/>
 		<flow-ref doc:name="Flow Reference" doc:id="a53dcce3-29f8-408a-987c-d777dce07124" name="Shareable-payload"/>
-		<logger level="INFO" doc:name="Logger" doc:id="9f64dd2c-71e8-44e5-b605-5d1a9089f9e3" message="3"/>
 		<flow-ref doc:name="Flow Reference" doc:id="c6ae52ab-1c66-4c21-81a6-4acff72bf12c" name="csv"/>
 		<logger level="INFO" doc:name="Logger" doc:id="16e9f9f1-54d6-4903-86a3-b04bd2a47be7" message="4"/>
 	</flow>
