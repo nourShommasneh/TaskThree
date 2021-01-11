@@ -1,28 +1,37 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns:file="http://www.mulesoft.org/schema/mule/file" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
-	xmlns:db="http://www.mulesoft.org/schema/mule/db"
-	xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+<mule xmlns:validation="http://www.mulesoft.org/schema/mule/validation" xmlns:file="http://www.mulesoft.org/schema/mule/file"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
 http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
 http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
-http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd">
+http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd
+http://www.mulesoft.org/schema/mule/validation http://www.mulesoft.org/schema/mule/validation/current/mule-validation.xsd">
+	<sub-flow name="Shareable-payload" doc:id="42c95422-8b72-4674-b397-bc896b7051c7" >
+		<db:select doc:name="Select" doc:id="166ccda0-fd14-4eb5-a773-a0ff280698c2" config-ref="Database_Config">
+			<db:sql><![CDATA[select * from social.comments;]]></db:sql>
+		</db:select>
+		<set-variable value="#[payload]" doc:name="Set Variable" doc:id="f5071c99-7420-4f9f-9756-3f63e3ee3174" variableName="backupVar" />
+	</sub-flow>
 	<flow name="task2Flow" doc:id="88f961b2-7c61-446d-a28f-20e5118768c1" >
-		<http:listener doc:name="Listener" doc:id="2f61123d-6bed-4ec9-9306-3eb93683005c" path="/new" config-ref="HTTP_Listener_config"/>
-		<try doc:name="Try" doc:id="94e4f414-f065-44c7-9e60-41a53396a1d9" >
-			<logger level="INFO" doc:name="Logger" doc:id="a74c44eb-5463-4854-b33f-10d12d10acb9" message="#[error.description]"/>
-			<error-handler >
+		<http:listener doc:name="Listener" doc:id="2f61123d-6bed-4ec9-9306-3eb93683005c" path="/new" config-ref="HTTP_Listener_config">
+			<http:error-response >
+				<http:body ><![CDATA[#[output application/json --- payload]]]></http:body>
+			</http:error-response>
+		</http:listener>
+		<try doc:name="Try" doc:id="94e4f414-f065-44c7-9e60-41a53396a1d9">
+			<logger level="INFO" doc:name="Logger" doc:id="a74c44eb-5463-4854-b33f-10d12d10acb9" message="1" />
+			<logger level="INFO" doc:name="Logger" doc:id="722c9ef4-fd73-4047-a943-0204bd63e9a2" message="wont be checked after an error occur,try considered as a new subflow such as flow ref flow " />
+			<error-handler>
 				<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="20b50a2a-5b5f-412d-bd98-5ef461d9c923" type="ANY">
-					<logger level="INFO" doc:name="Logger" doc:id="4923ee65-c1c0-4af3-bc49-eeb01aaed161" message="#[error.description]"/>
+					<logger level="INFO" doc:name="Logger" doc:id="4923ee65-c1c0-4af3-bc49-eeb01aaed161" message="#[error.description]" />
 				</on-error-continue>
 			</error-handler>
 		</try>
 		<set-variable value="#[attributes.queryParams.ftype]" doc:name="QueryParamBackup1" doc:id="e6836fcf-5dc3-4178-a466-1c81356ab619" variableName="QueryParamBackup1"/>
 		<set-variable value="#[attributes.queryParams.stype]" doc:name="QueryParamBackup2" doc:id="184b0aa8-e7af-4c2a-b17c-cd35e2368c4b" variableName="QueryParamBackup2" />
-		<db:select doc:name="Select" doc:id="166ccda0-fd14-4eb5-a773-a0ff280698c2" config-ref="Database_Config">
-			<db:sql ><![CDATA[select * from social.comments;]]></db:sql>
-		</db:select>
-		<set-variable value="#[payload]" doc:name="Set Variable" doc:id="f5071c99-7420-4f9f-9756-3f63e3ee3174" variableName="backupVar"/>
+		<flow-ref doc:name="Flow Reference" doc:id="7c4baebf-6bc4-491c-a925-8c8f1acd565d" name="Shareable-payload" />
 		<choice doc:name="Choice" doc:id="e2484277-1bc6-4567-b86e-36d581cbb78d" >
 			<when expression='#[vars.QueryParamBackup1 == "xml" and vars.QueryParamBackup2 == null]'>
 				<flow-ref doc:name="Flow Reference" doc:id="62db6c71-12b2-4403-a660-bcbfb600b8db" name="JsonToXml" />

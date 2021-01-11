@@ -7,7 +7,15 @@ http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/htt
 http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
 http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
 	<flow name="comments" doc:id="223664dd-b809-4763-8b35-57be044bb29f" >
-		<http:listener doc:name="Listener" doc:id="cb527946-fe65-4344-b36b-48adaed48f16" path="/comments1" config-ref="HTTP_Listener_config"/>
+		<http:listener doc:name="Listener" doc:id="cb527946-fe65-4344-b36b-48adaed48f16" path="/comments1" config-ref="HTTP_Listener_config">
+			<http:error-response >
+				<http:body ><![CDATA[#[output application/json
+
+---
+
+payload]]]></http:body>
+			</http:error-response>
+		</http:listener>
 		<choice doc:name="Choice" doc:id="caa91313-f844-47e9-8f39-fe3c36df12b7" >
 			<when expression="#[attributes.queryParams.postId == null]">
 				<flow-ref doc:name="/comments" doc:id="d3595d61-dd8a-4607-ae48-3e61169ad9cf" name="noParams"/>

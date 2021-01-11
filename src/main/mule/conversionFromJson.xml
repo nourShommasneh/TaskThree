@@ -5,11 +5,33 @@
 	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
 http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd">
-	<sub-flow name="JsonToXml" doc:id="18dc25fe-ba10-44d0-beaa-1039110e8bc8" >
+	<sub-flow name="csv" doc:id="32d0afb6-b4a1-455f-a273-5c7368a1d5da" >
+		<set-payload value="#[vars.backupVar]" doc:name="Set Payload" doc:id="2c9f03c1-3bca-49c2-baf0-bdbe5142f511" />
+		<ee:transform doc:name="CSV" doc:id="d049fe80-c136-4a78-923b-f2355c9ec7c8">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/csv 
+separator = "|" , quoteValues = true , header = false
+---
+payload map{
+	
+	id: $.id ,
+	name: $.name,
+	postId: $.username,
+	email: $.email,
+		body: $.body
+	
+
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<file:write doc:name="Write" doc:id="1915cf4e-2e54-49f6-8f20-20ccd15f2500" path="C:\Users\nshommasneh\Desktop\rres\JsonTo\commentsCsv.csv" />
+	</sub-flow>
+	<sub-flow name="xml" doc:id="6ad66709-b469-4c46-ac31-7ef18bb3e1ed" >
 		<set-payload value="#[vars.backupVar]" doc:name="Set Payload" doc:id="ff55ed8b-17ab-424e-b8f1-c1c3dce1734a" />
-		<ee:transform doc:name="XML" doc:id="e1134a7a-254f-41a8-b741-89e1947301d4" >
-			<ee:message >
-				<ee:set-payload ><![CDATA[%dw 2.0
+		<ee:transform doc:name="XML" doc:id="e1134a7a-254f-41a8-b741-89e1947301d4">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
 output application/xml
 ---
 {
@@ -29,26 +51,24 @@ output application/xml
 }]]></ee:set-payload>
 			</ee:message>
 		</ee:transform>
-		<file:write doc:name="Write" doc:id="3944e517-918b-4ad3-a305-ef7d7bfceae1" path="C:\Users\nshommasneh\Desktop\rres\JsonTo\commentsXml.xml"/>
+		<file:write doc:name="Write" doc:id="3944e517-918b-4ad3-a305-ef7d7bfceae1" path="C:\Users\nshommasneh\Desktop\rres\JsonTo\commentsXml.xml" />
 	</sub-flow>
-	<sub-flow name="JsonToCsv" doc:id="ac598bf8-7233-48b1-a866-3d54d5769f19" >
-		<set-payload value="#[vars.backupVar]" doc:name="Set Payload" doc:id="2c9f03c1-3bca-49c2-baf0-bdbe5142f511" />
-		<ee:transform doc:name="CSV" doc:id="d049fe80-c136-4a78-923b-f2355c9ec7c8" >
-			<ee:message >
-				<ee:set-payload ><![CDATA[%dw 2.0
-output application/csv 
-separator = "|" , quoteValues = true , header = false
----
-[{
-	id: payload.id as String,
-	name: payload.name,
-	postId: payload.username,
-	email: payload.email,
-		body: payload.body
-	
-}]]]></ee:set-payload>
-			</ee:message>
-		</ee:transform>
-		<file:write doc:name="Write" doc:id="1915cf4e-2e54-49f6-8f20-20ccd15f2500" path="C:\Users\nshommasneh\Desktop\rres\JsonTo\commentsCsv.csv"/>
-	</sub-flow>
+	<flow name="JsonToXml" doc:id="06963306-e76e-45f2-8760-fe77fccd8ec0" >
+		<scheduler doc:name="Scheduler" doc:id="2b33f952-dccb-43ae-8c5e-1ab141bd7001">
+			<scheduling-strategy>
+				<cron expression="0 0 7 ? * *" timeZone="America/Los_Angeles" />
+			</scheduling-strategy>
+		</scheduler>
+		<flow-ref doc:name="Flow Reference" doc:id="2740424a-c3be-4b9b-8222-38702216c8ae" name="Shareable-payload"/>
+		<flow-ref doc:name="Flow Reference" doc:id="c26bb752-3c47-44be-8f0b-b0c0d8a78321" name="xml" />
+	</flow>
+	<flow name="JsonToCsv" doc:id="fd8da8c0-7441-4f23-a469-b966aab5c614" >
+		<scheduler doc:name="Scheduler" doc:id="f057ce24-06e0-4789-a06b-ff5e2d3a7f93">
+			<scheduling-strategy>
+				<fixed-frequency timeUnit="HOURS" frequency="1" startDelay="1" />
+			</scheduling-strategy>
+		</scheduler>
+		<flow-ref doc:name="Flow Reference" doc:id="ec96544d-3b82-420b-8066-7301993bd446" name="Shareable-payload"/>
+		<flow-ref doc:name="Flow Reference" doc:id="dc4f5c9c-88c4-4fe8-8490-ca666b3734f0" name="csv" />
+	</flow>
 </mule>
