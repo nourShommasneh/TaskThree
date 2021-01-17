@@ -56,10 +56,10 @@ output application/xml
 	<flow name="JsonToXml" doc:id="06963306-e76e-45f2-8760-fe77fccd8ec0" >
 		<scheduler doc:name="Scheduler" doc:id="2b33f952-dccb-43ae-8c5e-1ab141bd7001">
 			<scheduling-strategy>
-				<cron expression="0 0 7 ? * *" timeZone="America/Los_Angeles" />
+				<cron expression="0 0 7 ? * *" timeZone="EST" />
 			</scheduling-strategy>
 		</scheduler>
-		<flow-ref doc:name="Flow Reference" doc:id="2740424a-c3be-4b9b-8222-38702216c8ae" name="Shareable-payload"/>
+		<flow-ref doc:name="Flow Reference" doc:id="2740424a-c3be-4b9b-8222-38702216c8ae" name="Shareable-payload1"/>
 		<flow-ref doc:name="Flow Reference" doc:id="c26bb752-3c47-44be-8f0b-b0c0d8a78321" name="xml" />
 	</flow>
 	<flow name="JsonToCsv" doc:id="fd8da8c0-7441-4f23-a469-b966aab5c614" >
@@ -68,7 +68,7 @@ output application/xml
 				<fixed-frequency timeUnit="HOURS" frequency="1" startDelay="1" />
 			</scheduling-strategy>
 		</scheduler>
-		<flow-ref doc:name="Flow Reference" doc:id="ec96544d-3b82-420b-8066-7301993bd446" name="Shareable-payload"/>
+		<flow-ref doc:name="Flow Reference" doc:id="ec96544d-3b82-420b-8066-7301993bd446" name="Shareable-payload1"/>
 		<flow-ref doc:name="Flow Reference" doc:id="dc4f5c9c-88c4-4fe8-8490-ca666b3734f0" name="csv" />
 	</flow>
 </mule>

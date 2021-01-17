@@ -11,21 +11,19 @@ http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/fil
 		<logger level="INFO" doc:name="Logger" doc:id="248ebae4-b267-429b-85ff-de8d7fc36107" message="#[payload]"/>
 		<scatter-gather doc:name="Scatter-Gather" doc:id="9ced99b1-0a02-4729-8b79-157874677e4b" >
 			<route >
-				<async doc:name="Async" doc:id="b502aa03-976a-473c-9029-6751dd15ae79" >
-					<flow-ref doc:name="JsonToXml" doc:id="41d3dbcc-32f3-449b-907f-84cd5e756fea" name="JsonToXmlS" />
-				</async>
+				<flow-ref doc:name="JsonToCsv" doc:id="cff181f2-f6a5-40be-a8bd-67e85cf0d494" name="JsonToCsv"/>
 			</route>
 			<route >
-				<flow-ref doc:name="JsonToCsv" doc:id="cff181f2-f6a5-40be-a8bd-67e85cf0d494" name="JsonToCsv"/>
+				<flow-ref doc:name="JsonToXml" doc:id="41d3dbcc-32f3-449b-907f-84cd5e756fea" name="JsonToXml-scatter" />
 			</route>
 		</scatter-gather>
 	</flow>
-	<sub-flow name="JsonToXmlS" doc:id="7219afc6-979d-4178-bd64-575241f0bdd5" >
-		<flow-ref doc:name="Shareable-payload" doc:id="6d4ce7c5-a3d5-4267-9aad-8c0f46a51687" name="Shareable-payload" />
+	<sub-flow name="JsonToXml-scatter" doc:id="7219afc6-979d-4178-bd64-575241f0bdd5" >
+		<flow-ref doc:name="Shareable-payload" doc:id="6d4ce7c5-a3d5-4267-9aad-8c0f46a51687" name="Shareable-payload1" />
 		<flow-ref doc:name="Flow Reference" doc:id="3fabcccb-6c4f-49dd-8e84-99d2864b8698" name="xml"/>
 	</sub-flow>
-	<sub-flow name="conversion-to-csv2" doc:id="ecbd4b05-a6e6-4020-83cf-341baee46968" >
-		<flow-ref doc:name="Flow Reference" doc:id="21bcc775-4af9-460e-923c-342f840f39bf" name="Shareable-payload"/>
+	<sub-flow name="JsonToCSV-scatter" doc:id="ecbd4b05-a6e6-4020-83cf-341baee46968" >
+		<flow-ref doc:name="Flow Reference" doc:id="21bcc775-4af9-460e-923c-342f840f39bf" name="Shareable-payload1"/>
 		<flow-ref doc:name="Flow Reference" doc:id="c33ee7c0-997e-4918-9305-9b00a5d70c0a" name="csv"/>
 	</sub-flow>
 </mule>
